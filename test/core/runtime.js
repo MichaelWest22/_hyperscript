@@ -139,4 +139,23 @@ describe("the _hyperscript runtime", function () {
 				done();
 			})
 	});
+
+	it("String conversion handles objects without toString", function () {
+		var objWithoutToString = Object.create(null);
+		objWithoutToString.valueOf = function() { return "test"; };
+		var result = _hyperscript.internals.runtime.convertValue(objWithoutToString, "String");
+		result.should.equal("test");
+	});
+
+	it("Array conversion uses Array.from", function () {
+		var nodeList = document.querySelectorAll('div'); // NodeList
+		var result = _hyperscript.internals.runtime.convertValue(nodeList, "Array");
+		result.should.be.an('array');
+	});
+
+	it("Object conversion handles String objects", function () {
+		var stringObj = new String('{"foo": "bar"}');
+		var result = _hyperscript.internals.runtime.convertValue(stringObj, "Object");
+		result.should.deep.equal({foo: "bar"});
+	});
 });

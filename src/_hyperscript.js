@@ -190,7 +190,8 @@
          * @returns boolean
          */
         static isReservedChar(c) {
-            return c === "`" || c === "^";
+            return c === "^";
+            // Note: backtick (`) removed as it's handled as string delimiter before reaching this check
         }
 
         /**
@@ -7404,7 +7405,7 @@
                                     window.location.href = to;
                                 }
                             }
-                        } else {
+                        } else if (to) {
                             runtime.implicitLoop(to, function (target) {
 
                                 if (target === window) {

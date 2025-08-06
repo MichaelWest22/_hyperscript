@@ -451,4 +451,20 @@ describe("the _hyperscript tokenizer", function () {
 		clearWorkArea();
 	});
 
+	it("handles reserved characters properly", function () {
+		var lexer = _hyperscript.internals.lexer;
+		
+		var token = lexer.tokenize("^").consumeToken();
+		token.type.should.equal("RESERVED");
+		token.value.should.equal("^");
+	});
+
+	it("throws error for unknown tokens", function () {
+		var lexer = _hyperscript.internals.lexer;
+		
+		(function() {
+			lexer.tokenize("\u00A9"); // copyright symbol
+		}).should.throw("Unknown token: © ");
+	});
+
 });

@@ -116,7 +116,7 @@
 
 				worker.postMessage({
 					type: "init",
-					_hyperscript: runtime.hyperscriptUrl,
+					_hyperscript: runtime.hyperscriptUrl || "../src/_hyperscript.js",
 					extraScripts: extraScripts,
 					tokens: bodyTokens,
 					source: tokens.source,

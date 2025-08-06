@@ -131,3 +131,7 @@ function getParameters(xhr) {
 		return parseParams(xhr.requestBody);
 	}
 }
+
+function fail(message) {
+	throw new Error(message || "Test failed");
+}

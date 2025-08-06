@@ -42,4 +42,13 @@ describe("the measure command", function () {
 			fail("Should not have thrown");
 		}
 	});
+
+	it("throws error for invalid measurement property", function (done) {
+		var measure = make("<div _='on click measure invalidProperty catch e put e into my.innerHTML then trigger done'></div>");
+		measure.addEventListener('done', function() {
+			measure.innerHTML.should.equal("No such measurement as invalidProperty");
+			done();
+		});
+		measure.click();
+	});
 });
