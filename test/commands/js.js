@@ -47,4 +47,20 @@ describe("The (inline) js command", function () {
 		div.click();
 		div.innerHTML.should.equal("2");
 	});
+
+	it("can handle promises", function (done) {
+		window.promiseTestResult = null;
+		var div = make(
+			'<div _="on click js ' +
+				'Promise.resolve(42).then(function(val) { window.promiseTestResult = val; }); ' +
+				'return Promise.resolve(42); ' +
+				'end"></div>'
+		);
+		div.click();
+		setTimeout(function() {
+			assert.equal(window.promiseTestResult, 42);
+			delete window.promiseTestResult;
+			done();
+		}, 20);
+	});
 });

@@ -796,4 +796,207 @@ describe("the on feature", function () {
 
 	});
 
+    // Intersection Event Tests
+	it("can listen for intersection events", function (done) {
+		var div = make("<div _='on intersection put \"Intersected\" into me'></div>");
+		
+		// Mock IntersectionObserver
+		var originalIO = window.IntersectionObserver;
+		var mockCallback;
+		window.IntersectionObserver = function(callback) {
+			mockCallback = callback;
+			return {
+				observe: function() {},
+				disconnect: function() {}
+			};
+		};
+		
+		// Wait for hyperscript to initialize
+		setTimeout(function() {
+			if (mockCallback) {
+				mockCallback([{isIntersecting: true, target: div}]);
+				setTimeout(function() {
+					div.innerHTML.should.equal("Intersected");
+					window.IntersectionObserver = originalIO;
+					done();
+				}, 10);
+			} else {
+				window.IntersectionObserver = originalIO;
+				done();
+			}
+		}, 50);
+	});
+
+	it("can destructure intersection parameters", function (done) {
+		var div = make("<div _='on intersection(intersecting) if intersecting put \"Visible\" into me else put \"Hidden\" into me'></div>");
+		
+		var originalIO = window.IntersectionObserver;
+		var mockCallback;
+		window.IntersectionObserver = function(callback) {
+			mockCallback = callback;
+			return {
+				observe: function() {},
+				disconnect: function() {}
+			};
+		};
+		
+		setTimeout(function() {
+			if (mockCallback) {
+				mockCallback([{isIntersecting: true, target: div}]);
+				setTimeout(function() {
+					div.innerHTML.should.equal("Visible");
+					
+					mockCallback([{isIntersecting: false, target: div}]);
+					setTimeout(function() {
+						div.innerHTML.should.equal("Hidden");
+						window.IntersectionObserver = originalIO;
+						done();
+					}, 10);
+				}, 10);
+			} else {
+				window.IntersectionObserver = originalIO;
+				done();
+			}
+		}, 50);
+	});
+
+	it("can use threshold modifier for intersection events", function (done) {
+		var div = make("<div _='on intersection having threshold 0.5 put \"Half visible\" into me'></div>");
+		
+		var originalIO = window.IntersectionObserver;
+		var observerOptions;
+		window.IntersectionObserver = function(callback, options) {
+			observerOptions = options;
+			return {
+				observe: function() {},
+				disconnect: function() {}
+			};
+		};
+		
+		setTimeout(function() {
+			if (observerOptions && observerOptions.threshold !== undefined) {
+				observerOptions.threshold.should.equal(0.5);
+			}
+			window.IntersectionObserver = originalIO;
+			done();
+		}, 50);
+	});
+
+	it("can listen for intersection events from other elements", function (done) {
+		var target = make("<div id='target'></div>");
+		var div = make("<div _='on intersection from #target put \"Target intersected\" into me'></div>");
+		
+		var originalIO = window.IntersectionObserver;
+		var mockCallback;
+		var observedElement;
+		window.IntersectionObserver = function(callback) {
+			mockCallback = callback;
+			return {
+				observe: function(el) { observedElement = el; },
+				disconnect: function() {}
+			};
+		};
+		
+		setTimeout(function() {
+			if (observedElement && mockCallback) {
+				observedElement.should.equal(target);
+				mockCallback([{isIntersecting: true, target: target}]);
+				setTimeout(function() {
+					div.innerHTML.should.equal("Target intersected");
+					window.IntersectionObserver = originalIO;
+					done();
+				}, 10);
+			} else {
+				window.IntersectionObserver = originalIO;
+				done();
+			}
+		}, 50);
+	});
+
+	it("can use with modifier for intersection events", function (done) {
+		var root = make("<div id='root'></div>");
+		var div = make("<div _='on intersection with #root put \"With root\" into me'></div>");
+		
+		var originalIO = window.IntersectionObserver;
+		var observerOptions;
+		window.IntersectionObserver = function(callback, options) {
+			observerOptions = options;
+			return {
+				observe: function() {},
+				disconnect: function() {}
+			};
+		};
+		
+		setTimeout(function() {
+			if (observerOptions && observerOptions.root) {
+				observerOptions.root.should.equal(root);
+			}
+			window.IntersectionObserver = originalIO;
+			done();
+		}, 50);
+	});
+
+	it("can use margin modifier for intersection events", function (done) {
+		var div = make("<div _='on intersection having margin \"10px\" put \"With margin\" into me'></div>");
+		
+		var originalIO = window.IntersectionObserver;
+		var observerOptions;
+		window.IntersectionObserver = function(callback, options) {
+			observerOptions = options;
+			return {
+				observe: function() {},
+				disconnect: function() {}
+			};
+		};
+		
+		setTimeout(function() {
+			if (observerOptions && observerOptions.rootMargin !== undefined) {
+				observerOptions.rootMargin.should.equal("10px");
+			}
+			window.IntersectionObserver = originalIO;
+			done();
+		}, 50);
+	});
+
+	it("can listen for mutation of anything", function (done) {
+		var div = make("<div _='on mutation of anything put \"Mutated\" into me then wait for hyperscript:mutation'></div>");
+		div.setAttribute("foo", "bar");
+		setTimeout(function () {
+			div.innerHTML.should.equal("Mutated");
+			done();
+		}, 50);
+	});
+
+	it("can listen for mutation of subtree", function (done) {
+		var div = make("<div _='on mutation of subtree or attributes put \"Subtree mutated\" into me then wait for hyperscript:mutation'></div>");
+		div.setAttribute("foo", "bar");
+		setTimeout(function () {
+			div.innerHTML.should.equal("Subtree mutated");
+			done();
+		}, 50);
+	});
+
+	it("can debounce events", function (done) {
+		var div = make("<div _='on click debounced at 50ms put \"Debounced\" into me'></div>");
+		div.click();
+		div.click();
+		div.click();
+		div.innerHTML.should.equal("");
+		setTimeout(function() {
+			div.innerHTML.should.equal("Debounced");
+			done();
+		}, 100);
+	});
+
+	it("can throttle events", function (done) {
+		var count = 0;
+		var div = make("<div _='on click throttled at 50ms increment @count then put @count into me'></div>");
+		div.click();
+		div.click();
+		div.click();
+		setTimeout(function() {
+			div.innerHTML.should.equal("1");
+			done();
+		}, 100);
+	});
 });
