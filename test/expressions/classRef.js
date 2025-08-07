@@ -59,4 +59,13 @@ describe("the classRef expression", function () {
         Array.from(value)[0].should.equal(div);
     });
 
+	it("unterminated template classRef throws error", function () {
+		try {
+			evalHyperScript(".{'c1'");
+			should.fail("Expected error for unterminated class reference");
+		} catch (e) {
+			e.message.should.equal("Unterminated class reference");
+		}
+	});
+
 });

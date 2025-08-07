@@ -23,7 +23,8 @@
 			var basePart = window.location.hostname + (window.location.port ? ':' + window.location.port : '');
 			if (window.location.protocol === 'https:') {
 				finalUrl = "wss://" + basePart + finalUrl;
-			} else if (window.location.protocol === 'http:') {
+			} else {
+				// Default to ws:// for http:, file:, or other protocols
 				finalUrl = "ws://" + basePart + finalUrl;
 			}
 		}

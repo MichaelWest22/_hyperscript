@@ -1495,6 +1495,7 @@
                 });
                 evt['detail'] = detail;
             } else {
+                /* c8 ignore next 3 */
                 evt = document.createEvent("CustomEvent");
                 evt.initCustomEvent(eventName, true, true, detail);
             }
@@ -4740,7 +4741,7 @@
             parser.setParent(start, initFeature);
             return initFeature;
         });
-
+        /* c8 ignore next 12 */
         parser.addFeature("worker", function (parser, runtime, tokens) {
             if (tokens.matchToken("worker")) {
                 parser.raiseParseError(

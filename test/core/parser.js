@@ -107,4 +107,29 @@ describe("the _hyperscript parser", function () {
 		div.click();
 		div.innerText.should.equal("clicked");
 	});
+
+	it("requireOpToken error works", function () {
+		var msg = getParseErrorFor("[1 2]");
+		startsWith(msg, "Expected ']' but found '2'");
+	});
+
+	it("requireTokenType error works", function () {
+		var msg = getParseErrorFor("on click (123)");
+		startsWith(msg, "Expected one of");
+	});
+
+	it("requireToken error works", function () {
+		var msg = getParseErrorFor("if true 123");
+		startsWith(msg, "Expected 'end' but found '123'");
+	});
+
+	it("empty command list execute works", function () {
+		var div = make("<div _='on click'></div>");
+		div.click();
+	});
+
+	it("primaryExpression unexpected value error works", function () {
+		var msg = getParseErrorFor("on click log )");
+		startsWith(msg, "Unexpected value: )");
+	});
 });

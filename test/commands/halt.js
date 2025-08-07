@@ -21,6 +21,7 @@ describe("the halt command", function () {
 		child.dispatchEvent(event);
 		event.defaultPrevented.should.equal(false);
 		window.parentClicked.should.equal(false);
+		delete window.parentClicked;
 	});
 
 	it("can halt only default behavior", function () {
@@ -31,6 +32,7 @@ describe("the halt command", function () {
 		child.dispatchEvent(event);
 		event.defaultPrevented.should.equal(true);
 		window.parentClicked.should.equal(true);
+		delete window.parentClicked;
 	});
 
 	it("can halt the event", function () {

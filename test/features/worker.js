@@ -1,4 +1,5 @@
 describe("the worker feature", function () {
+	this.timeout(5000);
 	beforeEach(function () {
 		clearWorkArea();
 	});

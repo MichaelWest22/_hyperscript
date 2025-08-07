@@ -79,7 +79,7 @@ describe("_hyperscript regressions", function () {
 		var d1 = byId("d1");
 		setTimeout(function(){
 			d1.innerHTML.should.equal("here");
-			foo = null;
+			delete window.foo;
 			done();
 		}, 10)
 	});

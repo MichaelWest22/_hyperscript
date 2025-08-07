@@ -62,4 +62,14 @@ describe("the string expression", function () {
 		var result = evalHyperScript("`https://${foo}`", {locals:{foo:'bar'}});
 		result.should.equal('https://bar');
 	});
+
+	it("incomplete hex escape throws error", function () {
+		try {
+			evalHyperScript('"\\x');
+			should.fail("Expected error for incomplete hex escape");
+		} catch (e) {
+			e.message.should.contain("Invalid hexadecimal escape");
+		}
+	});
+
 });

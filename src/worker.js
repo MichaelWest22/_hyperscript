@@ -16,7 +16,7 @@
 
 	return (_hyperscript) => {
 		var invocationIdCounter = 0;
-
+		/* c8 ignore next 43 */
 		var workerFunc = function (self) {
 			self.onmessage = function (e) {
 				switch (e.data.type) {

@@ -29,4 +29,13 @@ describe("the idRef expression", function () {
 		var value = evalHyperScript("#d1", { me: document.createElement('div') });
 		value.should.equal(div);
 	});
+
+	it("unterminated template idRef throws error", function () {
+		try {
+			evalHyperScript("#{'d1'");
+			should.fail("Expected error for unterminated id reference");
+		} catch (e) {
+			e.message.should.equal("Unterminated id reference");
+		}
+	});
 });

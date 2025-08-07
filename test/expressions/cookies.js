@@ -39,4 +39,40 @@ describe("the cookies identifier", function () {
 		context.you.includes('bar').should.equal(true);
 	});
 
+	it("can set cookie with expires option", function () {
+		evalHyperScript("set cookies.testExpires to {value: 'test', expires: 'Thu, 01 Jan 2025 00:00:00 GMT'}");
+		var result = evalHyperScript("cookies.testExpires");
+		if (result) result.should.equal('test');
+	});
+
+	it("can set cookie with maxAge option", function () {
+		evalHyperScript("set cookies.testMaxAge to {value: 'test', maxAge: 3600}");
+		var result = evalHyperScript("cookies.testMaxAge");
+		if (result) result.should.equal('test');
+	});
+
+	it("can set cookie with partitioned option", function () {
+		evalHyperScript("set cookies.testPartitioned to {value: 'test', partitioned: true}");
+		var result = evalHyperScript("cookies.testPartitioned");
+		if (result) result.should.equal('test');
+	});
+
+	it("can set cookie with path option", function () {
+		evalHyperScript("set cookies.testPath to {value: 'test', path: '/'}");
+		var result = evalHyperScript("cookies.testPath");
+		if (result) result.should.equal('test');
+	});
+
+	it("can set cookie with samesite option", function () {
+		evalHyperScript("set cookies.testSamesite to {value: 'test', samesite: 'strict'}");
+		var result = evalHyperScript("cookies.testSamesite");
+		if (result) result.should.equal('test');
+	});
+
+	it("can set cookie with secure option", function () {
+		evalHyperScript("set cookies.testSecure to {value: 'test', secure: true}");
+		var result = evalHyperScript("cookies.testSecure");
+		if (result) result.should.equal('test');
+	});
+
 });

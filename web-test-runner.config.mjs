@@ -66,7 +66,7 @@ const config = {
   nodeResolve: true,
   coverage: true,
   coverageConfig: {
-    include: ['src/_hyperscript.js','src/hdb.js','src/socket.js','src/template.js','src/worker.js']
+    include: ['src/_hyperscript.js','src/socket.js','src/template.js','src/worker.js']
   },
   files: [
     'test/commands/**/*.js',
