@@ -324,4 +324,30 @@ describe("the fetch command", function () {
 		}, 50);
 	});
 
+	it("can timeout a fetch request", function (done) {
+		var abortController = new AbortController();
+		var abortSpy = sinon.spy(abortController, 'abort');
+		
+		// Mock AbortController constructor to return our spy
+		var originalAbortController = window.AbortController;
+		window.AbortController = function() {
+			return abortController;
+		};
+		
+		// Create a promise that never resolves to simulate a slow request
+		window.fetch.returns(new Promise(() => {}));
+		
+		var div = make("<div _='on click fetch /test {timeout: 100} catch e put \"timeout\" into me'></div>");
+		div.click();
+		
+		setTimeout(function () {
+			// Verify abort was called due to timeout
+			abortSpy.called.should.equal(true);
+			
+			// Restore original AbortController
+			window.AbortController = originalAbortController;
+			done();
+		}, 150);
+	});
+
 });
