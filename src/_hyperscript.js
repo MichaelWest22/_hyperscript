@@ -7458,6 +7458,114 @@
             }
         });
 
+        parser.addCommand("convert", function (parser, runtime, tokens) {
+            if (!tokens.matchToken("convert")) return;
+            
+            // Optional filler words
+            tokens.matchToken("the");
+            tokens.matchToken("date");
+            tokens.matchToken("of");
+            
+            var expr = parser.requireElement("expression", tokens);
+            
+            var fromFormat;
+            if (tokens.matchToken("from")) {
+                fromFormat = parser.requireElement("stringLike", tokens);
+            } else {
+                // Default to "iso" format when 'from' is not specified
+                fromFormat = {
+                    type: "string",
+                    evaluate: function() { return "iso"; }
+                };
+            }
+            var toFormat;
+            if (tokens.matchToken("to")) {
+                toFormat = parser.requireElement("stringLike", tokens);
+            } else {
+                // Default to "local" format when 'to' is not specified
+                toFormat = {
+                    type: "string",
+                    evaluate: function() { return "local"; }
+                };
+            }
+            
+            var timezone = null;
+            if (tokens.matchToken("timezone")) {
+                timezone = parser.requireElement("stringLike", tokens);
+            }
+            
+            var convertCmd = {
+                expr: expr,
+                fromFormat: fromFormat,
+                toFormat: toFormat,
+                timezone: timezone,
+                args: [expr, fromFormat, toFormat, timezone],
+                op: function(ctx, dateStr, fromFmt, toFmt, tz) {
+                    var parsers = {
+                        "us-date": function(str) {
+                            if (str.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                                var parts = str.split("/");
+                                return parts[2] + "-" + parts[0] + "-" + parts[1]; // MM/DD/YYYY -> YYYY-MM-DD
+                            }
+                            return str;
+                        },
+                        "eu-date": function(str) {
+                            if (str.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                                var parts = str.split("/");
+                                return parts[2] + "-" + parts[1] + "-" + parts[0]; // DD/MM/YYYY -> YYYY-MM-DD
+                            }
+                            return str;
+                        }
+                    };
+                    
+                    var normalizedStr = parsers[fromFmt] ? parsers[fromFmt](dateStr) : dateStr;
+                    var date = new Date(normalizedStr);
+                    
+                    var dateOpts = { year: "numeric", month: "2-digit", day: "2-digit" };
+                    var timeOpts = { hour: "2-digit", minute: "2-digit" };
+                    var formatOptions = {
+                        "iso": { format: "iso" },
+                        "local": { format: "locale" },
+                        "local-date": dateOpts,
+                        "local-time": timeOpts,
+                        "local-datetime": Object.assign({}, dateOpts, timeOpts),
+                        "us-date": dateOpts,
+                        "eu-date": dateOpts,
+                        "iso-date": Object.assign({}, dateOpts, { timeZone: "UTC" }),
+                        "us-datetime": Object.assign({}, dateOpts, timeOpts),
+                        "eu-datetime": Object.assign({}, dateOpts, timeOpts)
+                    };
+                    
+                    var options = formatOptions[toFmt] || { format: "string" };
+                    if (tz) {
+                        options = Object.assign({}, options, { timeZone: tz });
+                    }
+                    
+                    var result;
+                    if (options.format === "iso") {
+                        result = date.toISOString();
+                    } else if (options.format === "locale") {
+                        result = date.toLocaleString();
+                    } else if (options.format === "string") {
+                        result = date.toString();
+                    } else if (toFmt === "iso-date") {
+                        result = date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, '0') + "-" + String(date.getDate()).padStart(2, '0');
+                    } else {
+                        var locale = 'en-US';
+                        if (toFmt.startsWith('eu-')) {
+                            locale = 'en-GB'; // Use British locale for EU formats
+                        }
+                        result = new Intl.DateTimeFormat(locale, options).format(date);
+                    }
+                    
+                    ctx.result = result;
+                    ctx.it = result;
+                    return runtime.findNext(convertCmd, ctx);
+                }
+            };
+            return convertCmd;
+        });
+
         config.conversions.dynamicResolvers.push(function (str, node) {
             if (!(str === "Values" || str.indexOf("Values:") === 0)) {
                 return;
