@@ -7471,25 +7471,13 @@
             var fromFormat;
             if (tokens.matchToken("from")) {
                 fromFormat = parser.requireElement("stringLike", tokens);
-            } else {
-                // Default to "iso" format when 'from' is not specified
-                fromFormat = {
-                    type: "string",
-                    evaluate: function() { return "iso"; }
-                };
             }
             var toFormat;
             if (tokens.matchToken("to")) {
                 toFormat = parser.requireElement("stringLike", tokens);
-            } else {
-                // Default to "local" format when 'to' is not specified
-                toFormat = {
-                    type: "string",
-                    evaluate: function() { return "local"; }
-                };
             }
             
-            var timezone = null;
+            var timezone;
             if (tokens.matchToken("timezone")) {
                 timezone = parser.requireElement("stringLike", tokens);
             }
@@ -7501,34 +7489,34 @@
                 timezone: timezone,
                 args: [expr, fromFormat, toFormat, timezone],
                 op: function(ctx, dateStr, fromFmt, toFmt, tz) {
-                    var parsers = {
-                        "us-date": function(str) {
-                            if (str.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-                                var parts = str.split("/");
-                                return parts[2] + "-" + parts[0] + "-" + parts[1]; // MM/DD/YYYY -> YYYY-MM-DD
-                            }
-                            return str;
-                        },
-                        "eu-date": function(str) {
-                            if (str.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-                                var parts = str.split("/");
-                                return parts[2] + "-" + parts[1] + "-" + parts[0]; // DD/MM/YYYY -> YYYY-MM-DD
-                            }
-                            return str;
-                        }
-                    };
+                    fromFmt = fromFmt || "iso";
+                    toFmt = toFmt || "local";
+                    function parseRegionalDate(str, isUS, dateOnly) {
+                        const m = str.match(/^(\d{2})\/(\d{2})\/(\d{4})(.*)$/);
+                        if (!m) return str;
+
+                        const month = isUS ? m[1] : m[2];
+                        const day   = isUS ? m[2] : m[1];
+                        const iso   = `${m[3]}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                        
+                        return iso + (m[4].trim() ? m[4].replace(/^,?\s*/, ' ') : 'T00:00:00' + (dateOnly ? 'Z' : ''));
+                    }
                     
-                    var normalizedStr = parsers[fromFmt] ? parsers[fromFmt](dateStr) : dateStr;
+                    var parserKey = fromFmt.substring(0, 2);
+                    var normalizedStr = (parserKey === "us" || parserKey === "eu") ? 
+                        parseRegionalDate(dateStr, parserKey === "us", fromFmt === "us-date" || fromFmt === "eu-date") : dateStr;
                     var date = new Date(normalizedStr);
                     
                     var dateOpts = { year: "numeric", month: "2-digit", day: "2-digit" };
                     var timeOpts = { hour: "2-digit", minute: "2-digit" };
                     var formatOptions = {
                         "iso": { format: "iso" },
+                        "iso-full": Object.assign({}, dateOpts, timeOpts, { second: "2-digit", postfixTz: 'iso' }),
                         "local": { format: "locale" },
                         "local-date": dateOpts,
                         "local-time": timeOpts,
                         "local-datetime": Object.assign({}, dateOpts, timeOpts),
+                        "display-datetime": Object.assign({}, dateOpts, timeOpts, { second: "2-digit", postfixTz: 'display' }),
                         "us-date": dateOpts,
                         "eu-date": dateOpts,
                         "iso-date": Object.assign({}, dateOpts, { timeZone: "UTC" }),
@@ -7537,23 +7525,57 @@
                     };
                     
                     var options = formatOptions[toFmt] || { format: "string" };
-                    if (tz) {
+                    // Only apply timezone to datetime formats, not date-only formats
+                    var isDateOnlyFormat = toFmt === "us-date" || toFmt === "eu-date" || toFmt === "local-date" || toFmt === "iso-date";
+                    if (tz && !isDateOnlyFormat) {
                         options = Object.assign({}, options, { timeZone: tz });
                     }
                     
                     var result;
                     if (options.format === "iso") {
                         result = date.toISOString();
+                    } else if (options.postfixTz) {
+                        // Formats that need timezone postfix handling
+                        var targetTz = tz || Intl.DateTimeFormat().resolvedOptions().timeZone;
+                        var formatter = new Intl.DateTimeFormat('sv-SE', Object.assign({}, options, { timeZone: targetTz }));
+                        var formattedDate = formatter.format(date);
+                        // Get timezone offset
+                        var offsetFormatter = new Intl.DateTimeFormat('en', {
+                            timeZone: targetTz,
+                            timeZoneName: 'longOffset'
+                        });
+                        var offsetStr = offsetFormatter.formatToParts(date).find(p => p.type === 'timeZoneName').value.replace('GMT', '');
+                        
+                        // Apply format-specific postfix
+                        if (options.postfixTz === 'iso') {
+                            // Get milliseconds manually
+                            var tzDate = new Date(date.toLocaleString('en-US', {timeZone: targetTz}));
+                            var ms = tzDate.getMilliseconds().toString().padStart(3, '0');
+                            result = formattedDate.replace(' ', 'T') + '.' + ms + offsetStr;
+                        } else {
+                            result = formattedDate + ' (UTC' + offsetStr + ')';
+                        }
                     } else if (options.format === "locale") {
                         result = date.toLocaleString();
                     } else if (options.format === "string") {
                         result = date.toString();
                     } else if (toFmt === "iso-date") {
-                        result = date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, '0') + "-" + String(date.getDate()).padStart(2, '0');
+                        result = date.getUTCFullYear() + "-" + String(date.getUTCMonth() + 1).padStart(2, '0') + "-" + String(date.getUTCDate()).padStart(2, '0');
+                    } else if (toFmt === "us-date") {
+                        result = String(date.getUTCMonth() + 1).padStart(2, '0') + "/" + String(date.getUTCDate()).padStart(2, '0') + "/" + date.getUTCFullYear();
+                    } else if (toFmt === "eu-date") {
+                        result = String(date.getUTCDate()).padStart(2, '0') + "/" + String(date.getUTCMonth() + 1).padStart(2, '0') + "/" + date.getUTCFullYear();
                     } else {
-                        var locale = 'en-US';
-                        if (toFmt.startsWith('eu-')) {
-                            locale = 'en-GB'; // Use British locale for EU formats
+                        var locale;
+                        if (toFmt.startsWith('us-')) {
+                            locale = 'en-US';
+                        } else if (toFmt.startsWith('eu-')) {
+                            locale = 'en-GB';
+                        } else if (toFmt.startsWith('local-')) {
+                            // Use browser's default locale for local-* formats
+                            locale = undefined;
+                        } else {
+                            locale = 'en-US';
                         }
                         result = new Intl.DateTimeFormat(locale, options).format(date);
                     }
