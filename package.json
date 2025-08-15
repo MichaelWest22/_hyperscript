@@ -7,7 +7,7 @@
   ],
   "version": "0.1.0",
   "homepage": "https://hyperscript.org/",
-  "license": "BSD 2-Clause",
+  "license": "BSD 0-Clause",
   "files": [
     "LICENSE",
     "README.md",
@@ -17,7 +17,7 @@
   "main": "dist/_hyperscript-convert.min.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bigskysoftware/_hyperscript.git"
+    "url": "git+https://github.com/MichaelWest22/_hyperscript.git"
   },
   "devDependencies": {
   }
