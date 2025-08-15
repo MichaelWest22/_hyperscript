@@ -7468,29 +7468,55 @@
             
             var expr = parser.requireElement("expression", tokens);
             
-            var fromFormat;
+            var fromFormat, inputTimezone;
             if (tokens.matchToken("from")) {
                 fromFormat = parser.requireElement("stringLike", tokens);
             }
-            var toFormat;
+            if (tokens.matchToken("timezone")) {
+                    inputTimezone = parser.requireElement("stringLike", tokens);
+            }
+            var toFormat, outputTimezone;
             if (tokens.matchToken("to")) {
                 toFormat = parser.requireElement("stringLike", tokens);
             }
-            
-            var timezone;
             if (tokens.matchToken("timezone")) {
-                timezone = parser.requireElement("stringLike", tokens);
+                outputTimezone = parser.requireElement("stringLike", tokens);
             }
-            
+
             var convertCmd = {
                 expr: expr,
                 fromFormat: fromFormat,
                 toFormat: toFormat,
-                timezone: timezone,
-                args: [expr, fromFormat, toFormat, timezone],
-                op: function(ctx, dateStr, fromFmt, toFmt, tz) {
+                inputTimezone: inputTimezone,
+                outputTimezone: outputTimezone,
+                args: [expr, fromFormat, toFormat, inputTimezone, outputTimezone],
+                op: function(ctx, dateStr, fromFmt, toFmt, inputTz, outputTz) {
                     fromFmt = fromFmt || "iso";
                     toFmt = toFmt || "local";
+                    
+                    // Apply input timezone conversion for timezone-agnostic formats
+                    function applyInputTimezone(dateObj, timeZone) {
+                        if (!timeZone) return dateObj
+
+                        // Your local system's offset at that date/time (in min)
+                        const localOffset = dateObj.getTimezoneOffset();
+
+                        // Target timezone offset for that date/time (DST-aware)
+                        const tzName = new Intl.DateTimeFormat('en-US', {
+                            timeZone,
+                            timeZoneName: 'longOffset'
+                        }).formatToParts(dateObj).find(p => p.type === 'timeZoneName').value;
+
+                        let targetOffset = 0;
+                        if (tzName !== 'GMT') {
+                            const sign = tzName[3] === '+' ? -1 : 1; // Invert: JS offset sign is opposite
+                            const [hh, mm = '0'] = tzName.slice(4).split(':');
+                            targetOffset = sign * ((+hh * 60) + (+mm));
+                        }
+
+                        // Adjust from local to target interpretation
+                        return new Date(dateObj.getTime() + ((targetOffset - localOffset) * 60000));
+                    }
                     function parseRegionalDate(str, isUS, dateOnly) {
                         const m = str.match(/^(\d{2})\/(\d{2})\/(\d{4})(.*)$/);
                         if (!m) return str;
@@ -7499,13 +7525,25 @@
                         const day   = isUS ? m[2] : m[1];
                         const iso   = `${m[3]}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
                         
-                        return iso + (m[4].trim() ? m[4].replace(/^,?\s*/, ' ') : 'T00:00:00' + (dateOnly ? 'Z' : ''));
+                        return iso + (m[4].trim() ? m[4].replace(/^,?\s*/, ' ') : 'T00:00:00');
                     }
                     
                     var parserKey = fromFmt.substring(0, 2);
                     var normalizedStr = (parserKey === "us" || parserKey === "eu") ? 
                         parseRegionalDate(dateStr, parserKey === "us", fromFmt === "us-date" || fromFmt === "eu-date") : dateStr;
+                    
+                    // Fix: For date-only ISO strings, create date in local timezone instead of UTC
+                    if ((fromFmt === 'iso' || fromFmt === 'iso-date') && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+                        normalizedStr += 'T00:00:00';
+                    }
+                    
                     var date = new Date(normalizedStr);
+
+                    // Check if we should skip timezone conversion (ISO with timezone info or date-only)
+                    var hasTimezoneInfo = fromFmt === 'iso' && /Z$|[+-]\d{2}:?\d{2}$/.test(dateStr);
+                    if (!hasTimezoneInfo && !toFmt.endsWith('-date') && !fromFmt.endsWith('-date')) {
+                        date = applyInputTimezone(date, inputTz);
+                    }
                     
                     var dateOpts = { year: "numeric", month: "2-digit", day: "2-digit" };
                     var timeOpts = { hour: "2-digit", minute: "2-digit" };
@@ -7526,9 +7564,8 @@
                     
                     var options = formatOptions[toFmt] || { format: "string" };
                     // Only apply timezone to datetime formats, not date-only formats
-                    var isDateOnlyFormat = toFmt === "us-date" || toFmt === "eu-date" || toFmt === "local-date" || toFmt === "iso-date";
-                    if (tz && !isDateOnlyFormat) {
-                        options = Object.assign({}, options, { timeZone: tz });
+                    if (outputTz && !toFmt.endsWith('-date')) {
+                        options = Object.assign({}, options, { timeZone: outputTz });
                     }
                     
                     var result;
@@ -7536,7 +7573,7 @@
                         result = date.toISOString();
                     } else if (options.postfixTz) {
                         // Formats that need timezone postfix handling
-                        var targetTz = tz || Intl.DateTimeFormat().resolvedOptions().timeZone;
+                        var targetTz = outputTz || Intl.DateTimeFormat().resolvedOptions().timeZone;
                         var formatter = new Intl.DateTimeFormat('sv-SE', Object.assign({}, options, { timeZone: targetTz }));
                         var formattedDate = formatter.format(date);
                         // Get timezone offset
@@ -7560,22 +7597,19 @@
                     } else if (options.format === "string") {
                         result = date.toString();
                     } else if (toFmt === "iso-date") {
-                        result = date.getUTCFullYear() + "-" + String(date.getUTCMonth() + 1).padStart(2, '0') + "-" + String(date.getUTCDate()).padStart(2, '0');
+                        result = date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, '0') + "-" + String(date.getDate()).padStart(2, '0');
                     } else if (toFmt === "us-date") {
-                        result = String(date.getUTCMonth() + 1).padStart(2, '0') + "/" + String(date.getUTCDate()).padStart(2, '0') + "/" + date.getUTCFullYear();
+                        result = String(date.getMonth() + 1).padStart(2, '0') + "/" + String(date.getDate()).padStart(2, '0') + "/" + date.getFullYear();
                     } else if (toFmt === "eu-date") {
-                        result = String(date.getUTCDate()).padStart(2, '0') + "/" + String(date.getUTCMonth() + 1).padStart(2, '0') + "/" + date.getUTCFullYear();
+                        result = String(date.getDate()).padStart(2, '0') + "/" + String(date.getMonth() + 1).padStart(2, '0') + "/" + date.getFullYear();
                     } else {
                         var locale;
                         if (toFmt.startsWith('us-')) {
                             locale = 'en-US';
                         } else if (toFmt.startsWith('eu-')) {
                             locale = 'en-GB';
-                        } else if (toFmt.startsWith('local-')) {
-                            // Use browser's default locale for local-* formats
-                            locale = undefined;
                         } else {
-                            locale = 'en-US';
+                            locale = undefined;
                         }
                         result = new Intl.DateTimeFormat(locale, options).format(date);
                     }
