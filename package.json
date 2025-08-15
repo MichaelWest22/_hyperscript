@@ -1,0 +1,24 @@
+{
+  "name": "hyperscript-convert",
+  "description": "convert command extension for hyperscript",
+  "keywords": [
+    "scripting",
+    "HTML"
+  ],
+  "version": "0.1.0",
+  "homepage": "https://hyperscript.org/",
+  "license": "BSD 2-Clause",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "src/*",
+    "dist/*"
+  ],
+  "main": "dist/_hyperscript-convert.min.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bigskysoftware/_hyperscript.git"
+  },
+  "devDependencies": {
+  }
+}
