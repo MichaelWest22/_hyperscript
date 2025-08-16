@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dyperscript Demo - Toddler-Friendly Hyperscript</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef, #fecfef, #ff9a9e);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #ff6b6b;
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .demo-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 3px dashed #ff6b6b;
+            border-radius: 15px;
+            background: #fff5f5;
+        }
+        
+        .demo-button {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s;
+            font-family: inherit;
+        }
+        
+        .demo-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .demo-box {
+            width: 100px;
+            height: 100px;
+            background: #4ecdc4;
+            border-radius: 15px;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s ease;
+        }
+        
+        .red { background: #ff6b6b !important; }
+        .blue { background: #4dabf7 !important; }
+        .big { transform: scale(1.5) !important; }
+        .small { transform: scale(0.5) !important; }
+        .happy::after { content: "😊"; }
+        .sad::after { content: "😢"; }
+        .bounce { animation: bounce 0.5s infinite alternate; }
+        .spin { animation: spin 1s linear infinite; }
+        .wiggle { animation: wiggle 0.5s ease-in-out infinite; }
+        
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-20px); }
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+        
+        .code-example {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .dyperscript { color: #e83e8c; font-weight: bold; }
+        .hyperscript { color: #28a745; font-weight: bold; }
+        
+        .hidden { display: none !important; }
+        
+        .explanation {
+            background: #e7f3ff;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍼 Dyperscript 🍼</h1>
+        <p class="subtitle">Hyperscript for toddlers! (the underscore is still silent, but now it giggles)</p>
+        
+        <div class="explanation">
+            <strong>What is Dyperscript?</strong><br>
+            Dyperscript is a toddler-friendly variant of hyperscript that uses baby language keywords instead of grown-up words. 
+            Perfect for when you want your code to be as cute as a button! 👶
+        </div>
+        
+        <div class="demo-section">
+            <h3>🎯 Basic Click Actions</h3>
+            <p>Instead of boring "on click toggle", we say "when ouchie make"!</p>
+            
+            <div class="code-example">
+                <span class="dyperscript">Dyperscript:</span> dy="when ouchie make red-thingy"<br>
+                <span class="hyperscript">Converts to:</span> _="on click toggle .red"
+            </div>
+            
+            <button class="demo-button" dy="when ouchie make red-thingy">Ouchie me to turn red!</button>
+            
+            <div class="demo-box" dy="when poke make big-thingy and happy">🎈</div>
+            <p style="text-align: center;">Poke the balloon!</p>
+        </div>
+        
+        <div class="demo-section">
+            <h3>👋 Show and Hide (Peekaboo!)</h3>
+            
+            <div class="code-example">
+                <span class="dyperscript">Dyperscript:</span> dy="when touchy peekaboo #secret-box"<br>
+                <span class="hyperscript">Converts to:</span> _="on click show #secret-box"
+            </div>
+            
+            <button class="demo-button" dy="when touchy peekaboo #secret-box">Peekaboo!</button>
+            <button class="demo-button" dy="when boop bye-bye #secret-box">Bye-bye!</button>
+            
+            <div id="secret-box" class="demo-box hidden">🎁</div>
+        </div>
+        
+        <div class="demo-section">
+            <h3>🎪 Fun Animations</h3>
+            
+            <div class="code-example">
+                <span class="dyperscript">Dyperscript:</span> dy="when ouchie make bouncy"<br>
+                <span class="hyperscript">Converts to:</span> _="on click toggle .bounce"
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="demo-button" dy="when ouchie make bouncy">Make it bouncy!</button>
+                <button class="demo-button" dy="when touchy make spinny">Make it spinny!</button>
+                <button class="demo-button" dy="when poke make wiggly">Make it wiggly!</button>
+            </div>
+            
+            <div class="demo-box" id="animation-box">🌟</div>
+        </div>
+        
+        <div class="demo-section">
+            <h3>😊 Mood Changes</h3>
+            
+            <div class="code-example">
+                <span class="dyperscript">Dyperscript:</span> dy="when boop flip happy and sad"<br>
+                <span class="hyperscript">Converts to:</span> _="on click toggle .happy .sad"
+            </div>
+            
+            <button class="demo-button" dy="when boop flip happy and sad">Change my mood!</button>
+            <div class="demo-box" id="mood-box">😐</div>
+        </div>
+        
+        <div class="demo-section">
+            <h3>⏰ Wait Commands (Patience, little one!)</h3>
+            
+            <div class="code-example">
+                <span class="dyperscript">Dyperscript:</span> dy="when ouchie make blue-thingy wait-wait quick next make red-thingy"<br>
+                <span class="hyperscript">Converts to:</span> _="on click toggle .blue wait 100ms then toggle .red"
+            </div>
+            
+            <button class="demo-button" dy="when ouchie make blue-thingy wait-wait quick next make red-thingy">Color sequence!</button>
+            <div class="demo-box" id="sequence-box">🎨</div>
+        </div>
+        
+        <div class="demo-section">
+            <h3>📚 Dyperscript Dictionary</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px;">
+                <div><strong>Baby Talk</strong></div>
+                <div><strong>Hyperscript</strong></div>
+                
+                <div>when/someone/somebody</div><div>on</div>
+                <div>ouchie/touchy/poke/boop</div><div>click</div>
+                <div>make/change/flip/switchie</div><div>toggle</div>
+                <div>peekaboo/hello/appear</div><div>show</div>
+                <div>hidey/bye-bye/no-see</div><div>hide</div>
+                <div>wait-wait/hold-on/sleepy</div><div>wait</div>
+                <div>and/next/after</div><div>then</div>
+                <div>quick/fast/slow</div><div>100ms/200ms/1s</div>
+                <div>red-thingy/blue-thingy</div><div>.red/.blue</div>
+                <div>bouncy/spinny/wiggly</div><div>.bounce/.spin/.wiggle</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load hyperscript first -->
+    <script src="https://unpkg.com/hyperscript.org@0.9.14"></script>
+    
+    <!-- Then load dyperscript -->
+    <script src="dyperscript.js"></script>
+    
+    <script>
+        // Add some extra mappings for the demo
+        dyperscript.addMapping('bouncy', '.bounce');
+        dyperscript.addMapping('spinny', '.spin');
+        dyperscript.addMapping('wiggly', '.wiggle');
+        
+        // Log conversions for debugging
+        console.log('🍼 Dyperscript loaded! Check the console to see conversions.');
+    </script>
+</body>
+</html>
