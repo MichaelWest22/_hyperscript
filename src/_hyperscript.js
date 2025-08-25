@@ -70,7 +70,7 @@
                 return Object.assign({}, val);
             }
         },
-            }
+    }
 
     const config = {
         attributes: "_, script, data-script",
@@ -266,7 +266,7 @@
                     } else if (inTemplate() && (Lexer.isAlpha(currentChar()) || currentChar() === "\\")) {
                         tokens.push(consumeTemplateIdentifier());
                     } else if (!inTemplate() && (Lexer.isAlpha(currentChar()) || Lexer.isIdentifierChar(currentChar()))) {
-                            tokens.push(consumeIdentifier());
+                        tokens.push(consumeIdentifier());
                     } else if (Lexer.isNumeric(currentChar())) {
                         tokens.push(consumeNumber());
                     } else if (!inTemplate() && (currentChar() === '"' || currentChar() === "`")) {
