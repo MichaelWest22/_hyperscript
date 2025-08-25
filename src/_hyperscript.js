@@ -70,7 +70,7 @@
                 return Object.assign({}, val);
             }
         },
-    }
+            }
 
     const config = {
         attributes: "_, script, data-script",
@@ -266,7 +266,7 @@
                     } else if (inTemplate() && (Lexer.isAlpha(currentChar()) || currentChar() === "\\")) {
                         tokens.push(consumeTemplateIdentifier());
                     } else if (!inTemplate() && (Lexer.isAlpha(currentChar()) || Lexer.isIdentifierChar(currentChar()))) {
-                        tokens.push(consumeIdentifier());
+                            tokens.push(consumeIdentifier());
                     } else if (Lexer.isNumeric(currentChar())) {
                         tokens.push(consumeNumber());
                     } else if (!inTemplate() && (currentChar() === '"' || currentChar() === "`")) {
@@ -2230,7 +2230,19 @@
         }
 
         resolveProperty(root, property) {
-            return this.flatGet(root, property, (root, property) => root[property] )
+            return this.flatGet(root, property, (root, property) => {
+                // Check for date properties first
+                if (root instanceof Date) {
+                    switch (property) {
+                        case "year": return root.getFullYear();
+                        case "month": return root.getMonth() + 1;
+                        case "day": return root.getDate();
+                        case "hour": return root.getHours();
+                        case "minutes": return root.getMinutes();
+                    }
+                }
+                return root[property];
+            })
         }
 
         resolveAttribute(root, property) {
@@ -2736,6 +2748,18 @@
                     return value;
                 },
             };
+        });
+
+        parser.addLeafExpression("dateKeyword", function (parser, runtime, tokens) {
+            if (tokens.matchToken("today")) {
+                return {
+                    type: "dateKeyword",
+                    keyword: "today",
+                    evaluate: function () {
+                        return new Date();
+                    },
+                };
+            }
         });
 
         parser.addLeafExpression("idRef", function (parser, runtime, tokens) {
@@ -3533,6 +3557,12 @@
                 timeFactor = 1000;
             } else if (tokens.matchToken("ms") || tokens.matchToken("milliseconds")) {
                 timeFactor = 1;
+            } else if (tokens.matchToken("m") || tokens.matchToken("minutes")) {
+                timeFactor = 60 * 1000;
+            } else if (tokens.matchToken("h") || tokens.matchToken("hours")) {
+                timeFactor = 60 * 60 * 1000;
+            } else if (tokens.matchToken("d") || tokens.matchToken("days")) {
+                timeFactor = 24 * 60 * 60 * 1000;
             }
             if (timeFactor) {
                 return {
@@ -3849,8 +3879,18 @@
                     args: [expr, rhs],
                     op: function (context, lhsVal, rhsVal) {
                         if (operator === "+") {
+                            if (lhsVal instanceof Date && typeof rhsVal === 'number') {
+                                var result = new Date(lhsVal);
+                                result.setTime(result.getTime() + rhsVal);
+                                return result;
+                            }
                             return lhsVal + rhsVal;
                         } else if (operator === "-") {
+                            if (lhsVal instanceof Date && typeof rhsVal === 'number') {
+                                var result = new Date(lhsVal);
+                                result.setTime(result.getTime() - rhsVal);
+                                return result;
+                            }
                             return lhsVal - rhsVal;
                         } else if (operator === "*") {
                             return lhsVal * rhsVal;
