@@ -8,16 +8,30 @@ _hyperscript.addCommand("convert", function (parser, runtime, tokens) {
     
     var expr = parser.requireElement("expression", tokens);
     
+    function parseFormat(tokens) {
+        var format = tokens.currentToken().value;
+        tokens.consumeToken();
+        
+        // Check for second word (date, time, datetime, full)
+        if (tokens.currentToken() && 
+            ['date', 'time', 'datetime', 'full'].includes(tokens.currentToken().value)) {
+            format += "-" + tokens.currentToken().value;
+            tokens.consumeToken();
+        }
+        
+        return { value: format };
+    }
+    
     var fromFormat, inputTimezone;
     if (tokens.matchToken("from")) {
-        fromFormat = parser.requireElement("stringLike", tokens);
+        fromFormat = parseFormat(tokens);
     }
     if (tokens.matchToken("timezone")) {
             inputTimezone = parser.requireElement("stringLike", tokens);
     }
     var toFormat, outputTimezone;
     if (tokens.matchToken("to")) {
-        toFormat = parser.requireElement("stringLike", tokens);
+        toFormat = parseFormat(tokens);
     }
     if (tokens.matchToken("timezone")) {
         outputTimezone = parser.requireElement("stringLike", tokens);
@@ -31,8 +45,8 @@ _hyperscript.addCommand("convert", function (parser, runtime, tokens) {
         outputTimezone: outputTimezone,
         args: [expr, fromFormat, toFormat, inputTimezone, outputTimezone],
         op: function(ctx, dateStr, fromFmt, toFmt, inputTz, outputTz) {
-            fromFmt = fromFmt || "iso";
-            toFmt = toFmt || "local";
+            fromFmt = (fromFmt && fromFmt.value) || "iso";
+            toFmt = (toFmt && toFmt.value) || "local";
             
             // Apply input timezone conversion for timezone-agnostic formats
             function applyInputTimezone(dateObj, timeZone) {
@@ -88,37 +102,32 @@ _hyperscript.addCommand("convert", function (parser, runtime, tokens) {
             var dateOpts = { year: "numeric", month: "2-digit", day: "2-digit" };
             var timeOpts = { hour: "2-digit", minute: "2-digit" };
             var formatOptions = {
-                "iso": { format: "iso" },
                 "iso-full": Object.assign({}, dateOpts, timeOpts, { second: "2-digit", postfixTz: 'iso' }),
-                "local": { format: "locale" },
                 "local-date": dateOpts,
                 "local-time": timeOpts,
                 "local-datetime": Object.assign({}, dateOpts, timeOpts),
                 "display-datetime": Object.assign({}, dateOpts, timeOpts, { second: "2-digit", postfixTz: 'display' }),
-                "us-date": dateOpts,
-                "eu-date": dateOpts,
-                "iso-date": Object.assign({}, dateOpts, { timeZone: "UTC" }),
                 "us-datetime": Object.assign({}, dateOpts, timeOpts),
                 "eu-datetime": Object.assign({}, dateOpts, timeOpts)
             };
             
-            var options = formatOptions[toFmt] || { format: "string" };
+            var options = formatOptions[toFmt] || {};
+            outputTz = outputTz || Intl.DateTimeFormat().resolvedOptions().timeZone;
             // Only apply timezone to datetime formats, not date-only formats
             if (outputTz && !toFmt.endsWith('-date')) {
                 options = Object.assign({}, options, { timeZone: outputTz });
             }
             
             var result;
-            if (options.format === "iso") {
+            if (toFmt === "iso") {
                 result = date.toISOString();
             } else if (options.postfixTz) {
                 // Formats that need timezone postfix handling
-                var targetTz = outputTz || Intl.DateTimeFormat().resolvedOptions().timeZone;
-                var formatter = new Intl.DateTimeFormat('sv-SE', Object.assign({}, options, { timeZone: targetTz }));
+                var formatter = new Intl.DateTimeFormat('sv-SE', options);
                 var formattedDate = formatter.format(date);
                 // Get timezone offset
                 var offsetFormatter = new Intl.DateTimeFormat('en', {
-                    timeZone: targetTz,
+                    timeZone: outputTz,
                     timeZoneName: 'longOffset'
                 });
                 var offsetStr = offsetFormatter.formatToParts(date).find(p => p.type === 'timeZoneName').value.replace('GMT', '');
@@ -126,15 +135,15 @@ _hyperscript.addCommand("convert", function (parser, runtime, tokens) {
                 // Apply format-specific postfix
                 if (options.postfixTz === 'iso') {
                     // Get milliseconds manually
-                    var tzDate = new Date(date.toLocaleString('en-US', {timeZone: targetTz}));
+                    var tzDate = new Date(date.toLocaleString('en-US', {timeZone: outputTz}));
                     var ms = tzDate.getMilliseconds().toString().padStart(3, '0');
                     result = formattedDate.replace(' ', 'T') + '.' + ms + offsetStr;
                 } else {
                     result = formattedDate + ' (UTC' + offsetStr + ')';
                 }
-            } else if (options.format === "locale") {
+            } else if (toFmt === "local") {
                 result = date.toLocaleString();
-            } else if (options.format === "string") {
+            } else if (toFmt === "string") {
                 result = date.toString();
             } else if (toFmt === "iso-date") {
                 result = date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, '0') + "-" + String(date.getDate()).padStart(2, '0');

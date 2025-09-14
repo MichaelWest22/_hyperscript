@@ -2,7 +2,8 @@
 <html>
 <head>
     <title>Convert Command Tester</title>
-    <script src="src/_hyperscript.js"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.14"></script>
+    <script src="src/_hyperscript-convert.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         table { border-collapse: collapse; width: 100%; }
@@ -41,76 +42,82 @@
         </thead>
         <tbody>
             <tr>
+                <td>string</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value to string put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to string put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to string put it into me"></td>
+            </tr>
+            <tr>
                 <td>iso</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value to 'string' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to 'string' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to 'string' put it into me"></td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value to iso put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to iso put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to iso put it into me"></td>
             </tr>
             <tr>
-                <td>iso-date</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value to 'iso-date' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to 'iso-date' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to 'iso-date' put it into me"></td>
+                <td>iso date</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value to iso date put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to iso date put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to iso date put it into me"></td>
             </tr>
             <tr>
-                <td>iso-full</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value to 'iso-full' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to 'iso-full' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to 'iso-full' put it into me"></td>
+                <td>iso full</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value to iso full put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to iso full put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to iso full put it into me"></td>
             </tr>
             <tr>
-                <td>us-date</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value to 'us-date' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to 'us-date' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to 'us-date' put it into me"></td>
+                <td>us date</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value to us date put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to us date put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to us date put it into me"></td>
             </tr>
             <tr>
-                <td>eu-date</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value to 'eu-date' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to 'eu-date' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to 'eu-date' put it into me"></td>
+                <td>eu date</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value to eu date put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to eu date put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to eu date put it into me"></td>
             </tr>
             <tr>
-                <td>us-datetime</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value to 'us-datetime' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to 'us-datetime' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to 'us-datetime' put it into me"></td>
+                <td>us datetime</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value to us datetime put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to us datetime put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to us datetime put it into me"></td>
             </tr>
             <tr>
-                <td>eu-datetime</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value to 'eu-datetime' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to 'eu-datetime' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to 'eu-datetime' put it into me"></td>
+                <td>eu datetime</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value to eu datetime put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to eu datetime put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to eu datetime put it into me"></td>
             </tr>
             <tr>
                 <td>local</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value to 'local' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to 'local' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to 'local' put it into me"></td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value to local put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to local put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to local put it into me"></td>
             </tr>
             <tr>
-                <td>local-date</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value to 'local-date' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to 'local-date' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to 'local-date' put it into me"></td>
+                <td>local date</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value to local date put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to local date put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to local date put it into me"></td>
             </tr>
             <tr>
-                <td>local-time</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value to 'local-time' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to 'local-time' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to 'local-time' put it into me"></td>
+                <td>local time</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value to local time put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to local time put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to local time put it into me"></td>
             </tr>
             <tr>
-                <td>local-datetime</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value to 'local-datetime' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to 'local-datetime' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to 'local-datetime' put it into me"></td>
+                <td>local datetime</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value to local datetime put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to local datetime put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to local datetime put it into me"></td>
             </tr>
             <tr>
-                <td>display-datetime</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value to 'display-datetime' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to 'display-datetime' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to 'display-datetime' put it into me"></td>
+                <td>display datetime</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value to display datetime put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to display datetime put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to display datetime put it into me"></td>
             </tr>
         </tbody>
     </table>
@@ -127,22 +134,22 @@
         </thead>
         <tbody>
             <tr>
-                <td>us-datetime (NYC)</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value to 'us-datetime' timezone 'America/New_York' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to 'us-datetime' timezone 'America/New_York' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to 'us-datetime' timezone 'America/New_York' put it into me"></td>
+                <td>us datetime (NYC)</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value to us datetime timezone 'America/New_York' put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to us datetime timezone 'America/New_York' put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to us datetime timezone 'America/New_York' put it into me"></td>
             </tr>
             <tr>
-                <td>eu-datetime (London)</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value to 'eu-datetime' timezone 'Europe/London' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to 'eu-datetime' timezone 'Europe/London' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to 'eu-datetime' timezone 'Europe/London' put it into me"></td>
+                <td>eu datetime (London)</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value to eu datetime timezone 'Europe/London' put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to eu datetime timezone 'Europe/London' put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to eu datetime timezone 'Europe/London' put it into me"></td>
             </tr>
             <tr>
-                <td>display-datetime (Tokyo)</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value to 'display-datetime' timezone 'Asia/Tokyo' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to 'display-datetime' timezone 'Asia/Tokyo' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to 'display-datetime' timezone 'Asia/Tokyo' put it into me"></td>
+                <td>display datetime (Tokyo)</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value to display datetime timezone 'Asia/Tokyo' put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value to display datetime timezone 'Asia/Tokyo' put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value to display datetime timezone 'Asia/Tokyo' put it into me"></td>
             </tr>
         </tbody>
     </table>
@@ -160,45 +167,45 @@
         <tbody>
             <tr>
                 <td>iso</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value from 'iso' to 'iso-full' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value from 'iso' to 'iso-full' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value from 'iso' to 'iso-full' put it into me"></td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value from iso to iso full put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value from iso to iso full put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value from iso to iso full put it into me"></td>
             </tr>
             <tr>
-                <td>iso-date</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value from 'iso-date' to 'iso-full' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value from 'iso-date' to 'iso-full' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value from 'iso-date' to 'iso-full' put it into me"></td>
+                <td>iso date</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value from iso date to iso full put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value from iso date to iso full put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value from iso date to iso full put it into me"></td>
             </tr>
             <tr>
-                <td>iso-full</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value from 'iso-full' to 'iso-full' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value from 'iso-full' to 'iso-full' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value from 'iso-full' to 'iso-full' put it into me"></td>
+                <td>iso full</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value from iso full to iso full put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value from iso full to iso full put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value from iso full to iso full put it into me"></td>
             </tr>
             <tr>
-                <td>us-date</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value from 'us-date' to 'iso-full' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value from 'us-date' to 'iso-full' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value from 'us-date' to 'iso-full' put it into me"></td>
+                <td>us date</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value from us date to iso full put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value from us date to iso full put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value from us date to iso full put it into me"></td>
             </tr>
             <tr>
-                <td>eu-date</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value from 'eu-date' to 'iso-full' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value from 'eu-date' to 'iso-full' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value from 'eu-date' to 'iso-full' put it into me"></td>
+                <td>eu date</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value from eu date to iso full put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value from eu date to iso full put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value from eu date to iso full put it into me"></td>
             </tr>
             <tr>
-                <td>us-datetime</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value from 'us-datetime' to 'iso-full' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value from 'us-datetime' to 'iso-full' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value from 'us-datetime' to 'iso-full' put it into me"></td>
+                <td>us datetime</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value from us datetime to iso full put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value from us datetime to iso full put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value from us datetime to iso full put it into me"></td>
             </tr>
             <tr>
-                <td>eu-datetime</td>
-                <td class="result" _="on input from #dateInput convert #dateInput.value from 'eu-datetime' to 'iso-full' put it into me"></td>
-                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value from 'eu-datetime' to 'iso-full' put it into me"></td>
-                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value from 'eu-datetime' to 'iso-full' put it into me"></td>
+                <td>eu datetime</td>
+                <td class="result" _="on input from #dateInput convert #dateInput.value from eu datetime to iso full put it into me"></td>
+                <td class="result" _="on input from #htmlDateInput convert #htmlDateInput.value from eu datetime to iso full put it into me"></td>
+                <td class="result" _="on input from #htmlDatetimeInput convert #htmlDatetimeInput.value from eu datetime to iso full put it into me"></td>
             </tr>
         </tbody>
     </table>
