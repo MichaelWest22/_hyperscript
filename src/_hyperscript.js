@@ -176,6 +176,9 @@ if (typeof document !== 'undefined') {
 
         // Wait for DOM ready, then initialize
         ready(() => {
+            // Fire event to allow extensions to register hooks before processing
+            document.dispatchEvent(new Event("hyperscript:beforeInit"));
+            
             _hyperscript.process(document.documentElement);
             document.dispatchEvent(new Event("hyperscript:ready"));
 

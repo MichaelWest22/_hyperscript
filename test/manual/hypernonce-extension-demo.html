@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hypernonce Extension Demo</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'nonce-abc123' 'unsafe-inline'; object-src 'none';">
+    <script nonce="abc123">
+        // Listen for nonce blocking events
+        document.addEventListener('hyperscript:nonceBlocked', (e) => {
+            console.log('Nonce blocked:', e.detail);
+        });
+    </script>
+    <script nonce="abc123" src="../../dist/ext/hypernonce.js"></script>
+    <script nonce="abc123" src="../../dist/_hyperscript.js"></script>
+    <!-- Page nonce established here -->
+    <script nonce="abc123">
+        console.log('Page nonce established: abc123');
+    </script>
+</head>
+<body>
+    <h1>Hypernonce Extension Demo</h1>
+    
+    <!-- This will work - matching nonce -->
+    <button id="btn1" _="/**nonce-abc123*/ on click add .clicked then wait 1s then remove .clicked">
+        Valid Nonce Button
+    </button>
+    
+    <!-- This will be blocked - wrong nonce -->
+    <button id="btn2" _="/**nonce-wrong*/ on click add .blocked">
+        Invalid Nonce Button (blocked)
+    </button>
+    
+    <!-- This will be blocked - no nonce when page has one -->
+    <button id="btn3" _="on click add .no-nonce">
+        No Nonce Button (blocked)
+    </button>
+    
+    <!-- Script tag with nonce attribute -->
+    <script type="text/hyperscript" nonce="abc123">
+        def globalFunction()
+            log 'Global function called with valid nonce'
+        end
+    </script>
+    
+    <!-- This script tag will be blocked -->
+    <script type="text/hyperscript" nonce="wrong">
+        def shouldNotWork()
+            add .blocked to #btn5
+        end
+    </script>
+    
+    <button id="btn4" _="/**nonce-abc123*/ on click call globalFunction()">
+        Call Global Function
+    </button>
+    
+    <button id="btn5" _="/**nonce-abc123*/ on click call shouldNotWork()">
+        Try Blocked Function (should show error in console)
+    </button>
+    
+    <div id="status">
+        <h3>Hypernonce Extension Demo</h3>
+        <p>&#x2705; Extension loads automatically - check console for nonce validation messages</p>
+        <p>&#x1F512; Only scripts with matching nonce comments will work</p>
+        
+        <h4>Test Scenarios:</h4>
+        <ul>
+            <li><strong>Valid Nonce Button:</strong> Has correct nonce comment - should work (turns green)</li>
+            <li><strong>Invalid Nonce Button:</strong> Has wrong nonce comment - blocked by extension</li>
+            <li><strong>No Nonce Button:</strong> Missing nonce comment - blocked by extension</li>
+            <li><strong>Call Global Function:</strong> Calls function from valid script tag - should work</li>
+            <li><strong>Try Blocked Function:</strong> Tries to call function from blocked script tag - fails because function doesn't exist</li>
+        </ul>
+        
+        <p><em>The "Try Blocked Function" demonstrates that the blocked script tag was completely removed - the function it defined doesn't exist, so hyperscript throws an error when trying to call it.</em></p>
+    </div>
+    
+   <style>
+        button { margin: 10px; padding: 10px; }
+        .clicked { background: green; color: white; }
+        .blocked { background: red; color: white; }
+        .no-nonce { background: orange; color: white; }
+        #status { margin-top: 20px; padding: 10px; background: #f0f0f0; border-radius: 5px; }
+    </style>
+</body>
+</html>
